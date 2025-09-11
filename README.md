@@ -12,7 +12,7 @@
    CREATE DATABASE "TaskListDb";
    ```
 2. Update the connection string in `src/TaskList.Api/appsettings.json` if needed.
-3. Apply migrations (you will create the initial migration in the starter):
+3. Apply migrations:
    ```bash
    dotnet ef database update --project src/TaskList.Api
    ```
@@ -23,7 +23,7 @@ dotnet run --project src/TaskList.Api
 ```
 
 API will be available at:
-- Swagger UI (development): https://localhost:5001/swagger
+- Swagger UI (development): https://localhost:5000/swagger
 
 ## ✅ Existing Functionality
 - **Users**
