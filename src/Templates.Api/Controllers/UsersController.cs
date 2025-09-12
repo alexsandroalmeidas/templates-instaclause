@@ -1,9 +1,9 @@
-using TaskList.Api.Data;
-using TaskList.Api.Entities;
+using Templates.Api.Data;
+using Templates.Api.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace TaskList.Api.Controllers
+namespace Templates.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

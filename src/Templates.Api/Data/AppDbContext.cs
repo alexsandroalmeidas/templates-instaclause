@@ -1,7 +1,7 @@
-using TaskList.Api.Entities;
+using Templates.Api.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace TaskList.Api.Data
+namespace Templates.Api.Data
 {
     public class AppDbContext : DbContext
     {

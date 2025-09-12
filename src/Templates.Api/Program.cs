@@ -1,4 +1,4 @@
-using TaskList.Api.Data;
+using Templates.Api.Data;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
