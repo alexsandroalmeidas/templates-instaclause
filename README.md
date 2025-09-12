@@ -52,8 +52,36 @@ The candidate should implement the Template Management feature.
    - Expand User entity with more information (for example: Street, City, Country, HouseNumber...)
    - Template Value field must be a valid scriban template, for example: "User {{ user.name }} lives in {{ user.city }}, {{ user.country }}"
    - Ensure that compile endpoint compiles given template using data of the specified user.
-   - Implement `GET /api/templates/{id}/compile/{userId}/html` → Compiles the selected template for a specific user and generates HTML document
-   - Each generated HTML document must support applying different styles depending on the provided user.
+   - Implement `GET /api/templates/{id}/compile/{userId}/html` → Compiles the selected template for a specific user and generates HTML document using default styles indicated below.
+   - Each user must be able to customize the styles of their HTML documents.
+  
+```css
+h1 {
+  font-family: "Arial";
+  font-size: 16pt;
+  font-weight: 700;
+  text-decoration: underline;
+  line-height: 1.15em;
+}
+h2 {
+  font-family: "Arial";
+  font-size: 12pt;
+  font-weight: 700;
+  line-height: 1.15em;
+}
+
+h3 {
+  font-size: 10pt;
+  font-weight: 700;
+  line-height: 1.15em;
+}
+
+p {
+  font-size: 10pt;
+  font-weight: 400;
+  line-height: 1.5em;
+}
+```
 
 4. Deliverable:
    - Candidate should provide a link **GitHub Repo** with changes implemented
