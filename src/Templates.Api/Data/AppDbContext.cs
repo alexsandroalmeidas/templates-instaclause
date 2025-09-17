@@ -1,5 +1,5 @@
-using Templates.Api.Entities;
 using Microsoft.EntityFrameworkCore;
+using Templates.Api.Data.Entities;
 
 namespace Templates.Api.Data
 {

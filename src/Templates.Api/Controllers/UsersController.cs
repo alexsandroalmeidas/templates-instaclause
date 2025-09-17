@@ -1,7 +1,8 @@
-using Templates.Api.Data;
-using Templates.Api.Entities;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Templates.Api.Application.Dtos;
+using Templates.Api.Application.Services;
+using Templates.Api.Data;
+using Templates.Api.Data.Entities;
 
 namespace Templates.Api.Controllers
 {
@@ -9,63 +10,95 @@ namespace Templates.Api.Controllers
     [Route("api/[controller]")]
     public class UsersController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly IUsersService _usersService;
 
-        public UsersController(AppDbContext context)
+        public UsersController(IUsersService usersService, AppDbContext context)
         {
-            _context = context;
+            _usersService = usersService ?? throw new ArgumentNullException(nameof(usersService));
         }
 
+        /// <summary>
+        /// Retorna uma lista de todos os usuários
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<User>))]
+        public async Task<IActionResult> GetUsers(CancellationToken cancellationToken)
         {
-            return await _context.Users.ToListAsync();
+            var users = await _usersService.GetUsersAsync(cancellationToken);
+            return Ok(users);
         }
 
+        /// <summary>
+        /// Retorna um usuário pelo ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserDto))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetUser(int id, CancellationToken cancellationToken)
         {
-            var user = await _context.Users.FindAsync(id);
+            var user = await _usersService.GetUserAsync(id, cancellationToken);
             if (user == null) return NotFound();
-            return user;
+
+            return Ok(user);
         }
 
+        /// <summary>
+        /// Cria um novo usuário
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult<User>> CreateUser(User user)
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(UserDto))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> CreateUser([FromBody] UserCreateDto dto, CancellationToken cancellationToken)
         {
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var createdUser = await _usersService.CreateUserAsync(dto, cancellationToken);
+
+            return CreatedAtAction(nameof(GetUser), new { id = createdUser.Id }, createdUser);
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(int id, User updatedUser)
+        /// <summary>
+        /// Atualiza um usuário existente
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="dto"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [HttpPut("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] UserUpdateDto dto, CancellationToken cancellationToken)
         {
-            if (id != updatedUser.Id) return BadRequest();
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (id != dto.Id) return BadRequest("O ID da URL não corresponde ao payload.");
 
-            _context.Entry(updatedUser).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!_context.Users.Any(u => u.Id == id)) return NotFound();
-                throw;
-            }
+            var result = await _usersService.UpdateUserAsync(dto, cancellationToken);
+            if (!result) return NotFound();
 
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(int id)
+        /// <summary>
+        /// Exclui um usuário pelo ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [HttpDelete("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeleteUser(int id, CancellationToken cancellationToken)
         {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null) return NotFound();
-
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
+            var deleted = await _usersService.DeleteUserAsync(id, cancellationToken);
+            if (!deleted) return NotFound();
 
             return NoContent();
         }

@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Templates.Api.Entities
+namespace Templates.Api.Data.Entities
 {
     public class User
     {
