@@ -2,7 +2,7 @@
 
 namespace Templates.Api.Data.Entities
 {
-    public class Address
+    public class Address : BaseEntity
     {
         [MaxLength(200)]
         public string Street { get; set; } = string.Empty;
@@ -21,5 +21,9 @@ namespace Templates.Api.Data.Entities
 
         [MaxLength(20)]
         public string ZipCode { get; set; } = string.Empty;
+
+
+        public int UserId { get; set; }
+        public User User { get; set; } = default!;
     }
 }

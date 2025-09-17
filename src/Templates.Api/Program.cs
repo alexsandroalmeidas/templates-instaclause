@@ -22,6 +22,7 @@ builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 builder.Services.AddScoped<ITemplatesRepository, TemplatesRepository>();
 
 builder.Services.AddScoped<IUsersService, UsersService>();
+builder.Services.AddScoped<ITemplatesService, TemplatesService>();
 
 var app = builder.Build();
 
