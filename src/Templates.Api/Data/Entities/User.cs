@@ -2,10 +2,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Templates.Api.Data.Entities
 {
-    public class User
+    public class User : BaseEntity
     {
-        public int Id { get; set; }
-
         [Required]
         [MaxLength(100)]
         public string FirstName { get; set; } = string.Empty;
@@ -17,5 +15,10 @@ namespace Templates.Api.Data.Entities
         [Required]
         [MaxLength(200)]
         public string Email { get; set; } = string.Empty;
+
+        public Address Address { get; set; } = new();
+
+        [MaxLength(20)]
+        public string PhoneNumber { get; set; } = string.Empty;
     }
 }

@@ -16,7 +16,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddAutoMapper(conf => conf.AddProfile<UserProfile>());
 
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
+builder.Services.AddScoped<ITemplatesRepository, TemplatesRepository>();
 
 builder.Services.AddScoped<IUsersService, UsersService>();
 

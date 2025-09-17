@@ -7,10 +7,10 @@ namespace Templates.Api.Application.Services
 {
     public class UsersService : IUsersService
     {
-        private readonly IUsersRepository _usersRepository;
+        private readonly IRepository<User> _usersRepository;
         private readonly IMapper _mapper;
 
-        public UsersService(IUsersRepository usersRepository, IMapper mapper)
+        public UsersService(IRepository<User> usersRepository, IMapper mapper)
         {
             _usersRepository = usersRepository ?? throw new ArgumentNullException(nameof(usersRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
@@ -23,7 +23,7 @@ namespace Templates.Api.Application.Services
             return _mapper.Map<IEnumerable<UserDto>>(users);
         }
 
-        public async Task<UserDto?> GetUserAsync(int id, CancellationToken cancellationToken)
+        public async Task<UserDto?> GetUserByIdAsync(int id, CancellationToken cancellationToken)
         {
             var user = await _usersRepository.GetByIdAsync(id, cancellationToken);
 

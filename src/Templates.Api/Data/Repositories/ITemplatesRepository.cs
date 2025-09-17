@@ -2,7 +2,7 @@
 
 namespace Templates.Api.Data.Repositories
 {
-    public interface IUsersRepository : IRepository<User>
+    public interface ITemplatesRepository : IRepository<Template>
     {
     }
 }
