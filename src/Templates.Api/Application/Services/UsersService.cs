@@ -37,6 +37,8 @@ namespace Templates.Api.Application.Services
 
         public async Task<UserDto> CreateUserAsync(UserCreateDto dto, CancellationToken cancellationToken)
         {
+            await ValidateUserEmailAsync(dto.Email, cancellationToken);
+
             var user = _mapper.Map<User>(dto);
 
             await _usersRepository.AddAsync(user, cancellationToken);
@@ -44,17 +46,28 @@ namespace Templates.Api.Application.Services
             return _mapper.Map<UserDto>(user);
         }
 
-        public async Task<bool> UpdateUserAsync(UserUpdateDto dto, CancellationToken cancellationToken)
+        private async Task ValidateUserEmailAsync(string email, CancellationToken cancellationToken, int id = 0)
+        {
+            var userDb = await _usersRepository.GetByEmailAsync(email, cancellationToken);
+            if (userDb != null && userDb.Id > 0 && (id == 0 || id != userDb.Id))
+            {
+                throw new InvalidOperationException("This email address is already in use.");
+            }
+        }
+
+        public async Task<UserDto> UpdateUserAsync(UserUpdateDto dto, CancellationToken cancellationToken)
         {
             var user = await _usersRepository.GetByIdAsync(dto.Id, cancellationToken);
 
-            if (user == null) return false;
+            if (user == null) return null;
+
+            await ValidateUserEmailAsync(dto.Email, cancellationToken, dto.Id);
 
             _mapper.Map(dto, user);
 
             await _usersRepository.UpdateAsync(user, cancellationToken);
 
-            return true;
+            return _mapper.Map<UserDto>(user);
         }
 
         public async Task<bool> DeleteUserAsync(int id, CancellationToken cancellationToken)

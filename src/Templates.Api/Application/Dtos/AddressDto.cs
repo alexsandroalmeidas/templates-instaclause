@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Templates.Api.Application.Dtos
+﻿namespace Templates.Api.Application.Dtos
 {
     public class AddressDto
     {

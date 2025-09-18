@@ -14,32 +14,32 @@ namespace Templates.Api.Application.Services
         private readonly ILogger<TemplatesService> _logger;
 
         private const string TemplateCssDefault = @"
-            h1 {
-                font-family: 'Arial';
-                font-size: 16pt;
-                font-weight: 700;
-                text-decoration: underline;
-                line-height: 1.15em;
-            }
+                        h1 {
+                            font-family: 'Arial';
+                            font-size: 16pt;
+                            font-weight: 700;
+                            text-decoration: underline;
+                            line-height: 1.15em;
+                        }
 
-            h2 {
-                font-family: 'Arial';
-                font-size: 12pt;
-                font-weight: 700;
-                line-height: 1.15em;
-            }
+                        h2 {
+                            font-family: 'Arial';
+                            font-size: 12pt;
+                            font-weight: 700;
+                            line-height: 1.15em;
+                        }
 
-            h3 {
-                font-size: 10pt;
-                font-weight: 700;
-                line-height: 1.15em;
-            }
+                        h3 {
+                            font-size: 10pt;
+                            font-weight: 700;
+                            line-height: 1.15em;
+                        }
 
-            p {
-                font-size: 10pt;
-                font-weight: 400;
-                line-height: 1.5em;
-            }
+                        p {
+                            font-size: 10pt;
+                            font-weight: 400;
+                            line-height: 1.5em;
+                        }
         ";
 
         public TemplatesService(

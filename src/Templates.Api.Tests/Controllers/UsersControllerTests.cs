@@ -26,7 +26,7 @@ namespace Templates.Api.Tests.Controllers
         public async Task GetUserById_ShouldReturnNotFound_WhenUserDoesNotExist()
         {
             _serviceMock.Setup(x => x.GetUserByIdAsync(It.IsAny<int>(), default))
-                        .ReturnsAsync((UserDto)null);
+                        .ReturnsAsync((UserDto?)null);
 
             var result = await _controller.GetUserById(1, default);
 

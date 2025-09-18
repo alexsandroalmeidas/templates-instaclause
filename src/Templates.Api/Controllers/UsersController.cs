@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Templates.Api.Application.Dtos;
 using Templates.Api.Application.Services;
+using Templates.Api.Data.Entities;
 using Templates.Api.Infrastructure.Responses;
 
 namespace Templates.Api.Controllers
@@ -88,14 +89,14 @@ namespace Templates.Api.Controllers
             if (id != dto.Id)
                 return BadRequest(ApiResponse<UserDto>.Fail(new[] { "The URL ID does not match the payload ID." }));
 
-            var updated = await _usersService.UpdateUserAsync(dto, cancellationToken);
+            var updatedUser = await _usersService.UpdateUserAsync(dto, cancellationToken);
 
-            if (!updated)
+            if (updatedUser == null)
                 return NotFound(ApiResponse<UserDto>.Fail(new[] { "User not found for update." }));
 
             _logger.LogInformation("User updated successfully. Id: {UserId}", id);
 
-            return NoContent();
+            return Ok(ApiResponse<UserDto>.Ok(updatedUser));
         }
 
         /// <summary>

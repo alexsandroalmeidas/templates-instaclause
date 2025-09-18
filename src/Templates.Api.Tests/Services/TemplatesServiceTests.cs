@@ -42,7 +42,7 @@ namespace Templates.Api.Tests.Services
         [Fact]
         public async Task GetTemplateByIdAsync_ShouldReturnNull_WhenNotFound()
         {
-            _templatesRepoMock.Setup(x => x.GetByIdAsync(It.IsAny<int>(), default)).ReturnsAsync((Template)null);
+            _templatesRepoMock.Setup(x => x.GetByIdAsync(It.IsAny<int>(), default)).ReturnsAsync((Template?)null);
 
             var result = await _service.GetTemplateByIdAsync(1, default);
 
@@ -80,7 +80,7 @@ namespace Templates.Api.Tests.Services
         public async Task UpdateTemplateAsync_ShouldReturnFalse_WhenTemplateNotFound()
         {
             var dto = new TemplateUpdateDto { Id = 1, Value = "Test" };
-            _templatesRepoMock.Setup(x => x.GetByIdAsync(dto.Id, default)).ReturnsAsync((Template)null);
+            _templatesRepoMock.Setup(x => x.GetByIdAsync(dto.Id, default)).ReturnsAsync((Template?)null);
 
             var result = await _service.UpdateTemplateAsync(dto, default);
 

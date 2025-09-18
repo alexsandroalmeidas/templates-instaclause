@@ -40,7 +40,7 @@ namespace Templates.Api.Tests.Controllers
         [Fact]
         public async Task GetTemplateById_ShouldReturnNotFound_WhenTemplateDoesNotExist()
         {
-            _serviceMock.Setup(x => x.GetTemplateByIdAsync(1, default)).ReturnsAsync((TemplateDto)null);
+            _serviceMock.Setup(x => x.GetTemplateByIdAsync(1, default)).ReturnsAsync((TemplateDto?)null);
 
             var result = await _controller.GetTemplateById(1, default);
 
