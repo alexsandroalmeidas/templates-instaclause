@@ -1,10 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Text;
 using Templates.Api.Application.Dtos;
 using Templates.Api.Application.Services;
+using Templates.Api.Infrastructure.Responses;
 
 namespace Templates.Api.Controllers
 {
     [ApiController]
+    //[ApiVersion("1.0")]
     [Route("api/[controller]")]
     public class TemplatesController : ControllerBase
     {
@@ -19,112 +24,92 @@ namespace Templates.Api.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        /// <summary>
-        /// Retorna uma lista de todos os templates
-        /// </summary>
-        /// <returns></returns>
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<TemplateDto>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<IEnumerable<TemplateDto>>))]
         public async Task<IActionResult> GetTemplates(CancellationToken cancellationToken)
         {
             var templates = await _templatesService.GetTemplatesAsync(cancellationToken);
-            return Ok(templates);
+            return Ok(ApiResponse<IEnumerable<TemplateDto>>.Ok(templates));
         }
 
-        /// <summary>
-        /// Retorna um template pelo ID
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
         [HttpGet("{id:int}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TemplateDto))]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<TemplateDto>))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ApiResponse<string>))]
         public async Task<IActionResult> GetTemplateById(int id, CancellationToken cancellationToken)
         {
             var template = await _templatesService.GetTemplateByIdAsync(id, cancellationToken);
-            return template is null ? NotFound() : Ok(template);
+            return template is null
+                ? NotFound(ApiResponse<string>.Fail($"Template {id} not found"))
+                : Ok(ApiResponse<TemplateDto>.Ok(template));
         }
 
-        /// <summary>
-        /// Retorna um template pelo ID e usuário ID
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="userId"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
         [HttpGet("{id:int}/compile/{userId:int}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TemplateDto))]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<string>))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ApiResponse<string>))]
         public async Task<IActionResult> GetTemplateByUserId(int id, int userId, CancellationToken cancellationToken)
         {
             var template = await _templatesService.GetTemplateByUserIdAsync(id, userId, cancellationToken);
-            return template is null ? NotFound() : Ok(template);
+            return template is null
+                ? NotFound(ApiResponse<string>.Fail($"Template {id} not found for User {userId}"))
+                : Ok(ApiResponse<string>.Ok(template));
         }
 
-        /// <summary>
-        /// Cria um novo template
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        [HttpGet("{id:int}/compile/{userId:int}/html")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ApiResponse<string>))]
+        public async Task<IActionResult> GetTemplateByUserIdHtml(int id, int userId, CancellationToken cancellationToken)
+        {
+            var templateHtml = await _templatesService.GetTemplateByUserIdHtmlAsync(id, userId, cancellationToken);
+
+            if (templateHtml is null)
+                return NotFound(ApiResponse<string>.Fail($"Template {id} not found for User {userId}"));
+
+            return Content(templateHtml, "text/html", Encoding.UTF8);
+        }
+
         [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(TemplateDto))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(ApiResponse<TemplateDto>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponse<string>))]
         public async Task<IActionResult> CreateTemplate([FromBody] TemplateCreateDto dto, CancellationToken cancellationToken)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-
             var createdTemplate = await _templatesService.CreateTemplateAsync(dto, cancellationToken);
 
-            _logger.LogInformation("Template criado com sucesso. Id: {TemplateId}", createdTemplate.Id);
+            _logger.LogInformation("Template created successfully. Id: {TemplateId}", createdTemplate.Id);
 
-            return CreatedAtAction(nameof(GetTemplateById), new { id = createdTemplate.Id }, createdTemplate);
+            return CreatedAtAction(nameof(GetTemplateById), new { id = createdTemplate.Id },
+                ApiResponse<TemplateDto>.Ok(createdTemplate, "Template created successfully"));
         }
 
-        /// <summary>
-        /// Atualiza um template existente
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="dto"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
         [HttpPut("{id:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponse<string>))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ApiResponse<string>))]
         public async Task<IActionResult> UpdateTemplate(int id, [FromBody] TemplateUpdateDto dto, CancellationToken cancellationToken)
         {
             if (id != dto.Id)
-                return BadRequest("O ID da URL não corresponde ao payload.");
+                return BadRequest(ApiResponse<string>.Fail("The Id in URL does not match the payload."));
 
             var updated = await _templatesService.UpdateTemplateAsync(dto, cancellationToken);
 
             if (!updated)
-                return NotFound();
+                return NotFound(ApiResponse<string>.Fail($"Template {id} not found"));
 
-            _logger.LogInformation("Template atualizado com sucesso. Id: {TemplateId}", id);
+            _logger.LogInformation("Template updated successfully. Id: {TemplateId}", id);
 
             return NoContent();
         }
 
-        /// <summary>
-        /// Exclui um template pelo ID
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ApiResponse<string>))]
         public async Task<IActionResult> DeleteTemplate(int id, CancellationToken cancellationToken)
         {
             var deleted = await _templatesService.DeleteTemplateAsync(id, cancellationToken);
 
             if (!deleted)
-                return NotFound();
+                return NotFound(ApiResponse<string>.Fail($"Template {id} not found"));
 
-            _logger.LogInformation("Template excluído com sucesso. Id: {TemplateId}", id);
+            _logger.LogInformation("Template deleted successfully. Id: {TemplateId}", id);
 
             return NoContent();
         }
