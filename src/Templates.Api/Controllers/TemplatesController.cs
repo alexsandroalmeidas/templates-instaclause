@@ -72,29 +72,25 @@ namespace Templates.Api.Controllers
         {
             var createdTemplate = await _templatesService.CreateTemplateAsync(dto, cancellationToken);
 
-            _logger.LogInformation("Template created successfully. Id: {TemplateId}", createdTemplate.Id);
-
             return CreatedAtAction(nameof(GetTemplateById), new { id = createdTemplate.Id },
                 ApiResponse<TemplateDto>.Ok(createdTemplate, "Template created successfully"));
         }
 
         [HttpPut("{id:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponse<string>))]
-        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ApiResponse<string>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponse<TemplateDto>))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ApiResponse<TemplateDto>))]
         public async Task<IActionResult> UpdateTemplate(int id, [FromBody] TemplateUpdateDto dto, CancellationToken cancellationToken)
         {
             if (id != dto.Id)
                 return BadRequest(ApiResponse<string>.Fail("The Id in URL does not match the payload."));
 
-            var updated = await _templatesService.UpdateTemplateAsync(dto, cancellationToken);
+            var updatedTemplate = await _templatesService.UpdateTemplateAsync(dto, cancellationToken);
 
-            if (!updated)
+            if (updatedTemplate == null)
                 return NotFound(ApiResponse<string>.Fail($"Template {id} not found"));
 
-            _logger.LogInformation("Template updated successfully. Id: {TemplateId}", id);
-
-            return NoContent();
+            return Ok(ApiResponse<TemplateDto>.Ok(updatedTemplate, "Template updated successfully"));
         }
 
         [HttpDelete("{id:int}")]

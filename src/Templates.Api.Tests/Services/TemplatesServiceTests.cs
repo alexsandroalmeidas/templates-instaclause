@@ -77,14 +77,14 @@ namespace Templates.Api.Tests.Services
         }
 
         [Fact]
-        public async Task UpdateTemplateAsync_ShouldReturnFalse_WhenTemplateNotFound()
+        public async Task UpdateTemplateAsync_ShouldReturnNull_WhenTemplateNotFound()
         {
             var dto = new TemplateUpdateDto { Id = 1, Value = "Test" };
             _templatesRepoMock.Setup(x => x.GetByIdAsync(dto.Id, default)).ReturnsAsync((Template?)null);
 
             var result = await _service.UpdateTemplateAsync(dto, default);
 
-            result.Should().BeFalse();
+            result.Should().BeNull();
         }
 
         [Fact]

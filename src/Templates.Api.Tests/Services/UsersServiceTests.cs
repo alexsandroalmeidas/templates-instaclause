@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Templates.Api.Application.Dtos;
 using Templates.Api.Application.Services;
@@ -12,6 +13,7 @@ namespace Templates.Api.Tests.Services
     public class UsersServiceTests
     {
         private readonly Mock<IUsersRepository> _usersRepoMock;
+        private readonly Mock<ILogger<UsersService>> _loggerMock;
         private readonly IMapper _mapper;
         private readonly UsersService _service;
 
@@ -19,7 +21,8 @@ namespace Templates.Api.Tests.Services
         {
             _usersRepoMock = new Mock<IUsersRepository>();
             _mapper = AutoMapperFixture.GetMapper();
-            _service = new UsersService(_usersRepoMock.Object, _mapper);
+            _loggerMock = new Mock<ILogger<UsersService>>();
+            _service = new UsersService(_usersRepoMock.Object, _mapper, _loggerMock.Object);
         }
 
         [Fact]
@@ -97,7 +100,7 @@ namespace Templates.Api.Tests.Services
 
             var result = await _service.UpdateUserAsync(dto, default);
 
-            result.FirstName.Should().Be("New");
+            result?.FirstName.Should().Be("New");
             _usersRepoMock.Verify(x => x.UpdateAsync(It.Is<User>(u => u.FirstName == "New"), default), Times.Once);
         }
 

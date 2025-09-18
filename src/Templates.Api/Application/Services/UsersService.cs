@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Scriban;
 using Templates.Api.Application.Dtos;
 using Templates.Api.Data.Entities;
 using Templates.Api.Data.Repositories;
@@ -9,11 +10,16 @@ namespace Templates.Api.Application.Services
     {
         private readonly IUsersRepository _usersRepository;
         private readonly IMapper _mapper;
+        private readonly ILogger<UsersService> _logger;
 
-        public UsersService(IUsersRepository usersRepository, IMapper mapper)
+        public UsersService(
+            IUsersRepository usersRepository, 
+            IMapper mapper,
+            ILogger<UsersService> logger)
         {
             _usersRepository = usersRepository ?? throw new ArgumentNullException(nameof(usersRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<IEnumerable<UserDto>> GetUsersAsync(CancellationToken cancellationToken)
@@ -43,6 +49,8 @@ namespace Templates.Api.Application.Services
 
             await _usersRepository.AddAsync(user, cancellationToken);
 
+            _logger.LogInformation("User created successfully. UserId: {UserId}", user.Id);
+
             return _mapper.Map<UserDto>(user);
         }
 
@@ -55,15 +63,21 @@ namespace Templates.Api.Application.Services
             }
         }
 
-        public async Task<UserDto> UpdateUserAsync(UserUpdateDto dto, CancellationToken cancellationToken)
+        public async Task<UserDto?> UpdateUserAsync(UserUpdateDto dto, CancellationToken cancellationToken)
         {
             var user = await _usersRepository.GetByIdAsync(dto.Id, cancellationToken);
 
-            if (user == null) return null;
+            if (user == null)
+            {
+                _logger.LogWarning("User not found for update. UserId: {UserId}", dto.Id);
+                return null;
+            }
 
             await ValidateUserEmailAsync(dto.Email, cancellationToken, dto.Id);
 
             _mapper.Map(dto, user);
+
+            _logger.LogInformation("User updated successfully. UserId: {UserId}", dto.Id);
 
             await _usersRepository.UpdateAsync(user, cancellationToken);
 

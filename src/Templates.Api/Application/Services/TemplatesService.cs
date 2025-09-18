@@ -176,7 +176,7 @@ namespace Templates.Api.Application.Services
             _logger.LogInformation("Template validated successfully");
         }
 
-        public async Task<bool> UpdateTemplateAsync(TemplateUpdateDto dto, CancellationToken cancellationToken)
+        public async Task<TemplateDto?> UpdateTemplateAsync(TemplateUpdateDto dto, CancellationToken cancellationToken)
         {
             ValidateTemplate(dto.Value);
 
@@ -184,14 +184,16 @@ namespace Templates.Api.Application.Services
             if (template == null)
             {
                 _logger.LogWarning("Template not found for update. TemplateId: {TemplateId}", dto.Id);
-                return false;
+                return null;
             }
 
             _mapper.Map(dto, template);
+
             await _templatesRepository.UpdateAsync(template, cancellationToken);
 
             _logger.LogInformation("Template updated successfully. TemplateId: {TemplateId}", dto.Id);
-            return true;
+
+            return _mapper.Map<TemplateDto>(template);
         }
 
         public async Task<bool> DeleteTemplateAsync(int id, CancellationToken cancellationToken)

@@ -70,7 +70,7 @@ namespace Templates.Api.Controllers
             return CreatedAtAction(nameof(GetUserById),
                 //new { id = createdUser.Id, version = "1.0" },
                 new { id = createdUser.Id },
-                ApiResponse<UserDto>.Ok(createdUser));
+                ApiResponse<UserDto>.Ok(createdUser, "User created successfully"));
         }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace Templates.Api.Controllers
 
             _logger.LogInformation("User updated successfully. Id: {UserId}", id);
 
-            return Ok(ApiResponse<UserDto>.Ok(updatedUser));
+            return Ok(ApiResponse<UserDto>.Ok(updatedUser, "User updated successfully"));
         }
 
         /// <summary>
