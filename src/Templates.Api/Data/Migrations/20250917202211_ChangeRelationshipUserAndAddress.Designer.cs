@@ -12,7 +12,7 @@ using Templates.Api.Data;
 namespace Templates.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250917184409_ChangeRelationshipUserAndAddress")]
+    [Migration("20250917202211_ChangeRelationshipUserAndAddress")]
     partial class ChangeRelationshipUserAndAddress
     {
         /// <inheritdoc />
@@ -77,7 +77,7 @@ namespace Templates.Api.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Address");
+                    b.ToTable("Addresses");
                 });
 
             modelBuilder.Entity("Templates.Api.Data.Entities.Template", b =>

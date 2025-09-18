@@ -7,10 +7,10 @@ namespace Templates.Api.Application.Services
 {
     public class UsersService : IUsersService
     {
-        private readonly IRepository<User> _usersRepository;
+        private readonly IUsersRepository _usersRepository;
         private readonly IMapper _mapper;
 
-        public UsersService(IRepository<User> usersRepository, IMapper mapper)
+        public UsersService(IUsersRepository usersRepository, IMapper mapper)
         {
             _usersRepository = usersRepository ?? throw new ArgumentNullException(nameof(usersRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
@@ -25,6 +25,9 @@ namespace Templates.Api.Application.Services
 
         public async Task<UserDto?> GetUserByIdAsync(int id, CancellationToken cancellationToken)
         {
+            if (id <= 0)
+                throw new Exception("The Id must be greater than zero");
+
             var user = await _usersRepository.GetByIdAsync(id, cancellationToken);
 
             return user == null
@@ -56,6 +59,9 @@ namespace Templates.Api.Application.Services
 
         public async Task<bool> DeleteUserAsync(int id, CancellationToken cancellationToken)
         {
+            if (id <= 0)
+                throw new Exception("The Id must be greater than zero");
+
             var user = await _usersRepository.GetByIdAsync(id, cancellationToken);
 
             if (user == null) return false;

@@ -10,6 +10,7 @@ namespace Templates.Api.Data
 
         public DbSet<User> Users => Set<User>();
         public DbSet<Template> Templates => Set<Template>();
+        public DbSet<Address> Addresses => Set<Address>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

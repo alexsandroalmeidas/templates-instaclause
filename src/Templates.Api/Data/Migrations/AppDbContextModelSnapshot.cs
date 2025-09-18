@@ -74,7 +74,7 @@ namespace Templates.Api.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Address");
+                    b.ToTable("Addresses");
                 });
 
             modelBuilder.Entity("Templates.Api.Data.Entities.Template", b =>

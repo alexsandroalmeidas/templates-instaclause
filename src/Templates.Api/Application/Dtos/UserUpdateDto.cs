@@ -4,8 +4,8 @@ namespace Templates.Api.Application.Dtos
 {
     public class UserUpdateDto
     {
-        [Required]
-        public int Id { get; set; }
+        [Required, Range(1, int.MaxValue)]
+        public int Id { get; set; } = default!;
 
         [Required, StringLength(100)]
         public string FirstName { get; set; } = default!;
@@ -15,5 +15,8 @@ namespace Templates.Api.Application.Dtos
 
         [Required, StringLength(200), EmailAddress]
         public string Email { get; set; } = default!;
+
+        [Required]
+        public AddressCreateDto Address { get; set; } = default!;
     }
 }

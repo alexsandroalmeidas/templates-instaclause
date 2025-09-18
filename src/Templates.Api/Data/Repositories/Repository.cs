@@ -15,10 +15,10 @@ namespace Templates.Api.Data.Repositories
             _dbSet = context.Set<TEntity>();
         }
 
-        public async Task<TEntity?> GetByIdAsync(int id, CancellationToken cancellationToken)
+        public virtual async Task<TEntity?> GetByIdAsync(int id, CancellationToken cancellationToken)
             => await _dbSet.FindAsync([id], cancellationToken);
 
-        public async Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken)
+        public virtual async Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken)
             => await _dbSet.ToListAsync(cancellationToken);
 
         public async Task AddAsync(TEntity entity, CancellationToken cancellationToken)

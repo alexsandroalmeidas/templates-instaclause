@@ -12,9 +12,18 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
 
-builder.Services.AddAutoMapper(conf => conf.AddProfile<UserProfile>());
+    options.LogTo(Console.WriteLine, Microsoft.Extensions.Logging.LogLevel.Information);
+
+    options.EnableSensitiveDataLogging();
+});
+
+builder.Services.AddAutoMapper(config =>
+{
+    config.AddMaps(typeof(UserProfile).Assembly);
+});
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
