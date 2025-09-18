@@ -1,11 +1,16 @@
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using Templates.Api.Application.Mappings;
 using Templates.Api.Application.Services;
 using Templates.Api.Data;
 using Templates.Api.Data.Repositories;
+using Templates.Api.Infrastructure.Extensions;
 using Templates.Api.Infrastructure.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddSerilogLogging(builder.Configuration);
+builder.Host.UseSerilog();
 
 builder.Services.AddControllers(options =>
 {
@@ -53,3 +58,4 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
+
